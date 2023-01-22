@@ -44,6 +44,7 @@ class Chunk():
 
     def __del__(self):
         """ Destructor, free memory """
+        print(f"Deleting chunk {self.chunk_position.x}, {self.chunk_position.y}")
         for sprite in self.chunk_tiles:
             pygame.sprite.Sprite.kill(sprite)
 
@@ -59,6 +60,7 @@ class Chunk():
                     # Calculate the local and world coordinates of this tile
                     tile_local_pos = Vector2(x * Tile_Size, y * Tile_Size)
                     tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
+
                     # If there is no block above make this a top block
                     if (y > 0 and self.noise[x][y-1] < block_gen_threshold) or y == self.ground_level:
                         # If no block to the left
@@ -71,7 +73,7 @@ class Chunk():
                         self.chunk_tiles.append(block)
                     else:
                         block = GroundBlock(
-                            position = (x * Tile_Size + self.chunk_offset_x, y * Tile_Size + self.chunk_offset_y), 
+                            position =  (tile_world_pos.x, tile_world_pos.y), 
                             surface  = self.blocks[Block_Ids["ground_center"]], 
                             groups   = [self.all_sprites, self.collision_sprites], 
                             block_id = Block_Ids["ground_center"]
@@ -86,11 +88,10 @@ class Chunk():
         chunk_file = open(relative_path, "r")
 
         chunk_data = ast.literal_eval(chunk_file.read())
-        # print(chunk_data)
+
         for tile in chunk_data:
             # Calculate the local and world coordinates of this tile
-            tile_local_pos = Vector2(tile[0], tile[1])
-            tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
+            tile_world_pos = Vector2(tile[0], tile[1])
 
             # Create our block
             block = GroundBlock(
@@ -101,6 +102,7 @@ class Chunk():
             )
             self.chunk_tiles.append(block)
 
+        # Close our file!
         chunk_file.close()
 
     def store_data(self):

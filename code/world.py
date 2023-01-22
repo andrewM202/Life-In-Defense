@@ -44,15 +44,13 @@ class World:
                 chunk_position = (x, y)
                 self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position)
 
-        # # Test delete a chunk
+        # Test delete a chunk
         chunk_position = (-1, 0)
-        self.chunks[chunk_position].__del__()
+        # self.chunks[chunk_position].__del__()
         del self.chunks[chunk_position] # Free memory
 
-        # # Test restore the chunk
+        # Test restore the chunk
         self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
-
-        print(self.collision_sprites)
 
     def run(self, dt):
         # Set background color 
@@ -79,8 +77,6 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.x = player.rect.centerx - Screen_Width / 2
         self.offset.y = player.rect.centery - Screen_Height / 2
 
-        print(len(self.sprites()))
-    
         for layer in Layers.values():
             # Loop through all of our sprites, sorting them so player can appear behind
             # objects
@@ -91,5 +87,6 @@ class CameraGroup(pygame.sprite.Group):
                     offset_rect = sprite.rect.copy()
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
+
 
 
