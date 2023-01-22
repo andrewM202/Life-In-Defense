@@ -13,6 +13,7 @@ Screen_Tile_Height = int(round(Screen_Height / Tile_Size))
 
 # How many tiles are in a chunk
 Chunk_Tile_Width, Chunk_Tile_Height = Screen_Tile_Width, Screen_Tile_Height
+Chunk_Pixel_Width, Chunk_Tile_Height = Chunk_Tile_Width * Tile_Size, Chunk_Tile_Height * Tile_Size
 
 Layers = {
     "ground": 0,

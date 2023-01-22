@@ -3,6 +3,8 @@ from settings import *
 from player import Player
 from chunk import Chunk
 from pygame.math import Vector2
+import os
+
 
 
 class World:
@@ -44,13 +46,68 @@ class World:
                 chunk_position = (x, y)
                 self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position)
 
-        # Test delete a chunk
-        chunk_position = (-1, 0)
-        # self.chunks[chunk_position].__del__()
-        del self.chunks[chunk_position] # Free memory
+        # # Test delete a chunk
+        # chunk_position = (-1, 0)
+        # # self.chunks[chunk_position].__del__()
+        # del self.chunks[chunk_position] # Free memory
 
-        # Test restore the chunk
-        self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
+        # # Test restore the chunk
+        # self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
+
+    def manage_chunks(self):
+        """ Remove or load chunks from memory depending
+        on proximity to player """
+
+        player_position = self.player.hitbox.center
+
+        # print(len(self.chunks))
+
+        # Delete Chunks
+
+        # Have a list of chunks we want to delete
+        chunks_to_delete = []
+
+        for key in self.chunks.keys():
+            player_chunk_distance = max([
+                abs(player_position[0] - (key[0] * Chunk_Tile_Width * Tile_Size)),
+                abs(player_position[0] - ((key[0] + 1 ) * Chunk_Tile_Width * Tile_Size))
+            ])
+
+            if player_chunk_distance > Screen_Width * 2.5:
+                # If the chunk crosses the threshold, add it to delete.
+                # We can't delete it here; will cause an error since we would be
+                # deleting from self.chunks while we are looping through it
+                chunks_to_delete.append(key)
+
+        for key in chunks_to_delete:
+            del self.chunks[key]
+
+        # Restore chunks that are within 2 screen widths of the player
+        chunks_range_x = (player_position[0] - (2 * Screen_Width), player_position[0] + (2 * Screen_Width)) 
+        chunks_to_load = []
+
+        for i in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
+            chunks_to_load.append((round(i / Chunk_Pixel_Width), 0))
+
+        for i in range(player_position[0], chunks_range_x[1], Chunk_Pixel_Width):
+            chunks_to_load.append((round(i / Chunk_Pixel_Width), 0))
+
+        for chunk_position in chunks_to_load:
+            if chunk_position not in self.chunks:
+                # Check if the file for this chunk already exists
+                relative_path = f"../world/chunks/{int(chunk_position[0])},{int(chunk_position[1])}.py"
+                isExist = os.path.exists(relative_path)
+
+                # print(f"Restoring chunk: {chunk_position}")
+                # print(chunks_to_load)
+                # print()
+
+                if isExist:
+                    self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
+                else:
+                    self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, False)
+                
+
 
     def run(self, dt):
         # Set background color 
@@ -59,6 +116,9 @@ class World:
 
         # Draw player
         self.all_sprites.custom_draw(self.player)
+
+        # Manage our chunks
+        self.manage_chunks()
 
         # Update our sprites
         self.all_sprites.update(dt)
