@@ -5,6 +5,7 @@ from settings import *
 class GenericSprite(pygame.sprite.Sprite):
     def __init__(self, position, surf, groups, z = 1):
         super().__init__(groups)
+        self.position = position
         self.image = surf
         self.rect = self.image.get_rect(topleft = position)
         self.z = z
@@ -12,8 +13,14 @@ class GenericSprite(pygame.sprite.Sprite):
 
 
 
-class GroundBlock(GenericSprite):
-    def __init__(self, pos, surface, groups):
-        super().__init__(pos, surface, groups)
+class Block(GenericSprite):
+    def __init__(self, position, surface, groups, block_id):
+        super().__init__(position, surface, groups)
         self.hitbox = self.rect.copy()
+        self.block_id = block_id
+
+
+class GroundBlock(Block):
+    def __init__(self, position, surface, groups, block_id):
+        super().__init__(position, surface, groups, block_id)
 

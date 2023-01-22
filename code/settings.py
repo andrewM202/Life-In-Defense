@@ -14,8 +14,13 @@ Screen_Tile_Height = int(round(Screen_Height / Tile_Size))
 # How many tiles are in a chunk
 Chunk_Tile_Width, Chunk_Tile_Height = Screen_Tile_Width, Screen_Tile_Height
 
-
 Layers = {
     "ground": 0,
     "player": 1
 }
+
+Block_Ids = {
+    "ground_top": 0,
+    "ground_center": 1
+}
+

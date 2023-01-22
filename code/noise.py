@@ -13,7 +13,7 @@ def generate_fractal_noise_2d(shape, res, octaves=1, persistence=0.5):
         return noise
 
 
-def generate_perlin_noise_2d(shape, res):
+def generate_perlin_noise_2d(shape, res, position=(0, 0)):
     def f(t):
         return 6*t**5 - 15*t**4 + 10*t**3
 
