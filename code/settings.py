@@ -25,5 +25,5 @@ Block_Ids = {
     "ground_center": 1
 }
 
-
+New_World = True
 

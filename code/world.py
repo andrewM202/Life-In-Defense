@@ -26,33 +26,20 @@ class World:
         self.blocks = {}
         self.load_blocks()
 
-        # Load tiles in
-        self.load_world()
-
         # Create player
         self.player = Player((600, self.ground_level * Tile_Size), self.all_sprites, self.collision_sprites)
+
+        # Reset world for now by deleting all files in chunks folder, will delete later
+        if New_World:
+            path = "../world/chunks/"
+            for file in os.listdir(path):
+                os.remove(path + file)
 
     def load_blocks(self):
         """ Load all of our blocks in as surfaces """
         for block in Block_Ids:
             self.blocks[Block_Ids[block]] = pygame.image.load(f"../graphics/ground/{block}.png").convert_alpha()
 
-    def load_world(self):
-        """ Load all the tiles in the world in """
-        # Create our chunks
-
-        for x in range(-1, 1):
-            for y in range (0, 1):
-                chunk_position = (x, y)
-                self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position)
-
-        # # Test delete a chunk
-        # chunk_position = (-1, 0)
-        # # self.chunks[chunk_position].__del__()
-        # del self.chunks[chunk_position] # Free memory
-
-        # # Test restore the chunk
-        # self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
 
     def manage_chunks(self):
         """ Remove or load chunks from memory depending
@@ -96,16 +83,20 @@ class World:
             if chunk_position not in self.chunks:
                 # Check if the file for this chunk already exists
                 relative_path = f"../world/chunks/{int(chunk_position[0])},{int(chunk_position[1])}.py"
-                isExist = os.path.exists(relative_path)
+                fileAlreadyExists = os.path.exists(relative_path)
 
-                # print(f"Restoring chunk: {chunk_position}")
-                # print(chunks_to_load)
-                # print()
-
-                if isExist:
+                if fileAlreadyExists:
                     self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
+                    print(f"Restoring chunk: {chunk_position}")
+                    str = ""
+                    for pos in self.chunks: str+= f"{pos}, "
+                    print(str)
                 else:
                     self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, False)
+                    print(f"Creating chunk: {chunk_position}")
+                    str = ""
+                    for pos in self.chunks: str+= f"{pos}, "
+                    print(str)
                 
 
 
