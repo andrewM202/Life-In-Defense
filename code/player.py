@@ -123,7 +123,7 @@ class Player(pygame.sprite.Sprite):
 
         # Horizontal movement
         self.pos.x += self.direction.x * self.speed * dt
-        self.pos.x += self.acceleration.x
+        self.pos.x += self.acceleration.x * dt
         self.hitbox.centerx = round(self.pos.x)
         self.rect.centerx = self.hitbox.centerx
         # Horizontal collision
@@ -131,7 +131,7 @@ class Player(pygame.sprite.Sprite):
 
         # Vertical movement
         self.pos.y += self.direction.y * self.speed *  dt
-        self.pos.y += self.acceleration.y
+        self.pos.y += self.acceleration.y * dt
         self.hitbox.centery = round(self.pos.y)
         self.rect.centery = self.hitbox.centery
         # Vertical collision, True because we want to do a ground collision test at the end

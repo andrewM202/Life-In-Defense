@@ -44,7 +44,8 @@ class Chunk():
 
     def __del__(self):
         """ Destructor, free memory """
-        print(f"Deleting chunk {self.chunk_position.x}, {self.chunk_position.y}")
+        if Chunk_Logging:
+            print(f"Deleting chunk {self.chunk_position.x}, {self.chunk_position.y}")
         for sprite in self.chunk_tiles:
             pygame.sprite.Sprite.kill(sprite)
 

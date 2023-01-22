@@ -47,8 +47,6 @@ class World:
 
         player_position = self.player.hitbox.center
 
-        # print(len(self.chunks))
-
         # Delete Chunks
 
         # Have a list of chunks we want to delete
@@ -87,16 +85,18 @@ class World:
 
                 if fileAlreadyExists:
                     self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
-                    print(f"Restoring chunk: {chunk_position}")
-                    str = ""
-                    for pos in self.chunks: str+= f"{pos}, "
-                    print(str)
+                    if Chunk_Logging:
+                        print(f"Restoring chunk: {chunk_position}")
+                        str = ""
+                        for pos in self.chunks: str+= f"{pos}, "
+                        print(str)
                 else:
                     self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, False)
-                    print(f"Creating chunk: {chunk_position}")
-                    str = ""
-                    for pos in self.chunks: str+= f"{pos}, "
-                    print(str)
+                    if Chunk_Logging:
+                        print(f"Creating chunk: {chunk_position}")
+                        str = ""
+                        for pos in self.chunks: str+= f"{pos}, "
+                        print(str)
                 
 
 

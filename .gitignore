@@ -1,0 +1,3 @@
+world/chunks/*
+code/venv/*
+code/__pycache__/*
