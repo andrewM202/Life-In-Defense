@@ -70,6 +70,14 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.x = player.rect.centerx - Screen_Width / 2
         self.offset.y = player.rect.centery - Screen_Height / 2
 
-        for sprite in self.sprites():
-            self.display_surface.blit(sprite.image, (sprite.rect.x, sprite.rect.y))
     
+        for layer in Layers.values():
+            # Loop through all of our sprites, sorting them so player can appear behind
+            # objects
+            for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
+                if sprite.z == layer:
+                    # Make a rect of the player's offset then subtract it 
+                    # from the sprite's position to make effect of movement
+                    offset_rect = sprite.rect.copy()
+                    offset_rect.center -= self.offset
+                    self.display_surface.blit(sprite.image, offset_rect)

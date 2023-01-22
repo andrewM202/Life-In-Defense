@@ -13,11 +13,12 @@ class Player(pygame.sprite.Sprite):
         # General setup
         self.image = self.animations[self.animation_status][self.frame_index]
         self.rect = self.image.get_rect(midbottom = position)
+        self.z = Layers["player"]
 
         # Movement attributes
         self.direction = pygame.math.Vector2(0, 0)
         self.pos = pygame.math.Vector2(self.rect.center)
-        self.speed = 200
+        self.speed = 300
 
         # Collision
         self.collision_sprites = collision_sprites
