@@ -1,6 +1,8 @@
 import pygame
 from settings import *
 from noise import generate_fractal_noise_2d
+from player import Player
+from sprites import GenericSprite, GroundBlock
 
 
 class World:
@@ -9,6 +11,19 @@ class World:
         # Get display surface
         self.display_surface = pygame.display.get_surface()
         self.noise = generate_fractal_noise_2d((Screen_Tile_Width, Screen_Tile_Height), (4, 4))
+
+        # Sprite groups
+        self.all_sprites = CameraGroup()
+        self.collision_sprites = pygame.sprite.Group()
+
+        # World settings
+        self.ground_level = 12
+
+        # Load tiles in
+        self.load_world()
+
+        # Create player
+        self.player = Player((600, self.ground_level * Tile_Size), self.all_sprites, self.collision_sprites)
 
     def load_world(self):
         """ Load all the tiles in the world in """
@@ -19,29 +34,42 @@ class World:
         # If we pass this threshold in our 
         # noise generation we are drawing a block
         block_gen_threshold = -0.1
-        ground_level = 20
 
         for x in range(0, Screen_Tile_Width):
             for y in range(0, Screen_Tile_Height):
-                if self.noise[x][y] >= block_gen_threshold and y >= ground_level:
+                if self.noise[x][y] >= block_gen_threshold and y >= self.ground_level:
                     # If there is no block above make this a top block
-                    if y > 0 and self.noise[x][y-1] < block_gen_threshold:
-                        self.display_surface.blit(ground_top, (x * Tile_Size , y * Tile_Size))
+                    if (y > 0 and self.noise[x][y-1] < block_gen_threshold) or y == self.ground_level:
+                        GroundBlock((x * Tile_Size , y * Tile_Size), ground_top, [self.all_sprites, self.collision_sprites])
                     else:
-                        self.display_surface.blit(ground_center, (x * Tile_Size , y * Tile_Size))
+                        GroundBlock((x * Tile_Size , y * Tile_Size), ground_center, [self.all_sprites, self.collision_sprites])
+                        # self.display_surface.blit(ground_center, (x * Tile_Size , y * Tile_Size))
 
-        # Loop through entire screen and fill with tiles
-        # for x in range(0, int(Screen_Tile_Width)):
-        #     for y in range(0, int(Screen_Tile_Height)):
-        #         if y == int(Screen_Tile_Height * 0.8):
-        #             self.display_surface.blit(ground_top, (x * Tile_Size , y * Tile_Size))
-        #         elif y >= int(Screen_Tile_Height * 0.8):
-        #             self.display_surface.blit(ground_center, (x * Tile_Size , y * Tile_Size))
 
     def run(self, dt):
         # Set background color 
         sky_bg_color = (92, 76, 255)
         self.display_surface.fill(sky_bg_color)
 
-        # Load tiles in
-        self.load_world()
+        # Draw player
+        self.all_sprites.custom_draw(self.player)
+
+        # Update our sprites
+        self.all_sprites.update(dt)
+
+
+class CameraGroup(pygame.sprite.Group):
+    def __init__(self):
+        super().__init__()
+        self.display_surface = pygame.display.get_surface()
+        self.offset = pygame.math.Vector2()
+
+    def custom_draw(self, player):
+        # Get position of player, then calculate the offset 
+        # of the playe rinto the center of the screen
+        self.offset.x = player.rect.centerx - Screen_Width / 2
+        self.offset.y = player.rect.centery - Screen_Height / 2
+
+        for sprite in self.sprites():
+            self.display_surface.blit(sprite.image, (sprite.rect.x, sprite.rect.y))
+    
