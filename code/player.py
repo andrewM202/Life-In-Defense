@@ -17,14 +17,13 @@ class Player(pygame.sprite.Sprite):
         self.z = Layers["player"]
 
         # Movement attributes
-        self.direction = pygame.math.Vector2(0, 0)
         self.pos = pygame.math.Vector2(self.rect.center)
-        self.speed = 500
-        self.acceleration = pygame.math.Vector2(0, 0)
+        self.speed = pygame.math.Vector2(0, 0)
+        self.acceleration = pygame.math.Vector2(1, 1)
         self.on_ground = True
-        self.jump_strength = -1.4
-        self.gravity_strength = 0.008
-        self.gravity_max = 2
+        self.jump_strength = 1000
+        self.gravity_strength = 8
+        self.default_speed = 500
 
         # Collision
         self.collision_sprites = collision_sprites
@@ -32,7 +31,7 @@ class Player(pygame.sprite.Sprite):
 
         # Timers
         self.timers = {
-            "jump": Timer(150) # Cooldown on jumping
+            "jump": Timer(50) # Cooldown on jumping
         }
 
 
@@ -44,15 +43,15 @@ class Player(pygame.sprite.Sprite):
 
         # Movement
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.direction.x = 1
+            self.speed.x = self.default_speed
         elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.direction.x = -1
+            self.speed.x = -self.default_speed
         else:
-            self.direction.x = 0
+            self.speed.x = 0
 
         # Jump if on ground and timer not active
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground and not self.timers["jump"].active:
-            self.acceleration.y = self.jump_strength
+            self.speed.y = -self.jump_strength
 
 
     def collision(self, direction):
@@ -75,30 +74,21 @@ class Player(pygame.sprite.Sprite):
                     # Check general sprite collision with player
                     if sprite.hitbox.colliderect(self.hitbox):
 
-                        if self.direction.y > 0: # Moving down
+                        if self.speed.y > 0: # Moving down
                             self.hitbox.bottom = sprite.hitbox.top
-                        if self.direction.y < 0: # Moving up
+                        if self.speed.y < 0: # Moving up
                             self.hitbox.top = sprite.hitbox.bottom
-
-                        self.acceleration.y = 0
+                        
                         self.rect.centery = self.hitbox.centery
                         self.pos.y = self.hitbox.centery
                             
             # Gravity calculation
             self.on_ground = on_ground
-            if not on_ground and self.acceleration.y < self.gravity_max:
-                self.acceleration.y += self.gravity_strength
+            if not on_ground:
+                self.speed.y += self.gravity_strength
                 if not self.timers["jump"].active: self.timers["jump"].activate()
             if on_ground:
-                self.acceleration.y = 0
-
-            # If gravity is on us change our direction so collision calculations work
-            if self.acceleration.y < 0:
-                self.direction.y = -1
-            elif self.acceleration.y == 0:
-                self.direction.y = 0
-            else:
-                self.direction.y = 1
+                self.speed.y = 0
 
         # No ground collision test
         elif direction == "horizontal":
@@ -106,32 +96,28 @@ class Player(pygame.sprite.Sprite):
                 if hasattr(sprite, "hitbox"):
                     # Check general sprite collision with player
                     if sprite.hitbox.colliderect(self.hitbox):
-                        if self.direction.x > 0: # Moving right
+                        if self.speed.x > 0: # Moving right
                             self.hitbox.right = sprite.hitbox.left
-                        if self.direction.x < 0: # Moving left
+                        if self.speed.x < 0: # Moving left
                             self.hitbox.left = sprite.hitbox.right
 
                         self.rect.centerx = self.hitbox.centerx
                         self.pos.x = self.hitbox.centerx
+                    
                             
 
 
     def move(self, dt):
-        # Normalize the direction vector so speed is constant
-        if self.direction.magnitude() > 0:
-            self.direction = self.direction.normalize()
-
         # Horizontal movement
-        self.pos.x += self.direction.x * self.speed * dt
-        self.pos.x += self.acceleration.x * dt
+        self.pos.x += self.speed.x * dt
         self.hitbox.centerx = round(self.pos.x)
         self.rect.centerx = self.hitbox.centerx
         # Horizontal collision
         self.collision("horizontal")
 
         # Vertical movement
-        self.pos.y += self.direction.y * self.speed *  dt
-        self.pos.y += self.acceleration.y * dt
+        self.pos.y += self.speed.y * dt
+        print(self.speed.y * dt)
         self.hitbox.centery = round(self.pos.y)
         self.rect.centery = self.hitbox.centery
         # Vertical collision, True because we want to do a ground collision test at the end
