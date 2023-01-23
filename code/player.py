@@ -117,11 +117,11 @@ class Player(pygame.sprite.Sprite):
 
         # Vertical movement
         self.pos.y += self.speed.y * dt
-        print(self.speed.y * dt)
         self.hitbox.centery = round(self.pos.y)
         self.rect.centery = self.hitbox.centery
         # Vertical collision, True because we want to do a ground collision test at the end
         self.collision("vertical")
+        self.speed.y *= 1 - dt
 
 
     def import_assets(self):

@@ -1,4 +1,5 @@
-import pygame, sys
+import pygame
+from sys import exit
 from settings import *
 from world import World
 
@@ -17,7 +18,7 @@ class Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    sys.exit()
+                    exit()
                 # if event.type == pygame.WINDOWRESIZED:
                 #     # Resize to closest interval of tile size
                 #     x, y = self.screen.get_size()
@@ -27,7 +28,7 @@ class Game():
             # If the place presses esc close game  
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 pygame.quit()
-                sys.exit()
+                exit()
 
 
             dt = self.clock.tick() / 1000

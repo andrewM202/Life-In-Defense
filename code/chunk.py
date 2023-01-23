@@ -1,12 +1,13 @@
 from settings import *
 from noise import generate_fractal_noise_2d
 from sprites import GroundBlock
-import pygame
-import ast # Used for converting our .py chunk files from strings into dictionaries
+# import pygame
+from pygame.sprite import Sprite
+from ast import literal_eval # Used for converting our .py chunk files from strings into dictionaries
 
 
 class Chunk():
-    def __init__(self, all_sprites, collision_sprites, block_surfs, ground_level = 12, chunk_position=(0 ,0), load_from_file = False):
+    def __init__(self, all_sprites, collision_sprites, block_surfs, ground_level = 6, chunk_position=(0 ,0), load_from_file = False):
         # How many pxiels wide / tall our chunk is
         self.chunk_pixel_width = Chunk_Tile_Width * Tile_Size
         self.chunk_pixel_height = Chunk_Tile_Height * Tile_Size
@@ -47,23 +48,19 @@ class Chunk():
         if Chunk_Logging:
             print(f"Deleting chunk {self.chunk_position.x}, {self.chunk_position.y}")
         for sprite in self.chunk_tiles:
-            pygame.sprite.Sprite.kill(sprite)
+            Sprite.kill(sprite)
 
     def generate(self):
         """ Generate the actual chunk """
-        # If we pass this threshold in our 
-        # noise generation we are drawing a block
-        block_gen_threshold = -0.1
-
         for x in range(0, Screen_Tile_Width):
             for y in range(0, Screen_Tile_Height):
-                if self.noise[x][y] >= block_gen_threshold and y >= self.ground_level:
+                if self.noise[x][y] >= Block_Gen_Threshold and (y >= self.ground_level and self.chunk_position.y == 0 or self.chunk_position.y > 0):
                     # Calculate the local and world coordinates of this tile
                     tile_local_pos = Vector2(x * Tile_Size, y * Tile_Size)
                     tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
 
                     # If there is no block above make this a top block
-                    if (y > 0 and self.noise[x][y-1] < block_gen_threshold) or y == self.ground_level:
+                    if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y * self.chunk_position.y == self.ground_level:
                         # If no block to the left
                         block = GroundBlock(
                             position = (tile_world_pos.x, tile_world_pos.y), 
@@ -88,7 +85,7 @@ class Chunk():
         # Retrieve our chunk's data
         chunk_file = open(relative_path, "r")
 
-        chunk_data = ast.literal_eval(chunk_file.read())
+        chunk_data = literal_eval(chunk_file.read())
 
         for tile in chunk_data:
             # Calculate the local and world coordinates of this tile

@@ -3,7 +3,7 @@ from settings import *
 from player import Player
 from chunk import Chunk
 from pygame.math import Vector2
-import os
+from os import listdir, remove, path
 
 
 
@@ -32,8 +32,8 @@ class World:
         # Reset world for now by deleting all files in chunks folder, will delete later
         if New_World:
             path = "../world/chunks/"
-            for file in os.listdir(path):
-                os.remove(path + file)
+            for file in listdir(path):
+                remove(path + file)
 
     def load_blocks(self):
         """ Load all of our blocks in as surfaces """
@@ -67,21 +67,28 @@ class World:
         for key in chunks_to_delete:
             del self.chunks[key]
 
-        # Restore chunks that are within 2 screen widths of the player
-        chunks_range_x = (player_position[0] - (2 * Screen_Width), player_position[0] + (2 * Screen_Width)) 
+        # Restore chunks that are within 2 screen widths or heights of the player
+        chunks_range_x = (player_position[0] - int(2 * Screen_Width), player_position[0] + int(1.2 * Screen_Width)) 
+        chunks_range_y = (player_position[1] - int(2 * Screen_Height), player_position[1] + int(1.2 * Screen_Height)) 
         chunks_to_load = []
 
-        for i in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
-            chunks_to_load.append((round(i / Chunk_Pixel_Width), 0))
+        for x in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
+            for y in range(player_position[1], chunks_range_y[0], -Chunk_Pixel_Height):
+                chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
+                if chunk_pos not in chunks_to_load:
+                    chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
 
         for i in range(player_position[0], chunks_range_x[1], Chunk_Pixel_Width):
-            chunks_to_load.append((round(i / Chunk_Pixel_Width), 0))
+            for i in range(player_position[1], chunks_range_y[1], Chunk_Pixel_Height):
+                chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
+                if chunk_pos not in chunks_to_load:
+                    chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
 
         for chunk_position in chunks_to_load:
             if chunk_position not in self.chunks:
                 # Check if the file for this chunk already exists
                 relative_path = f"../world/chunks/{int(chunk_position[0])},{int(chunk_position[1])}.py"
-                fileAlreadyExists = os.path.exists(relative_path)
+                fileAlreadyExists = path.exists(relative_path)
 
                 if fileAlreadyExists:
                     self.chunks[chunk_position] = Chunk(self.all_sprites, self.collision_sprites, self.blocks, self.ground_level, chunk_position, True)
