@@ -22,8 +22,9 @@ class Player(pygame.sprite.Sprite):
         self.speed = pygame.math.Vector2(0, 0)
         self.acceleration = pygame.math.Vector2(1, 1)
         self.on_ground = True
-        self.jump_strength = 1000
-        self.gravity_strength = 8
+        self.jump_strength = 7
+        self.default_gravity = 0.1 # We increase self.gravity_gravity by dt every frame we jump. After the jump is done, we set self.gravity_strength back to this default
+        self.gravity_strength = self.default_gravity
         self.default_speed = 500
 
         # Collision
@@ -32,11 +33,11 @@ class Player(pygame.sprite.Sprite):
 
         # Timers
         self.timers = {
-            "jump": Timer(50) # Cooldown on jumping
+            "jump": Timer(250) # Cooldown on jumping
         }
 
 
-    def input(self):
+    def input(self, dt):
         """ Handles player input """
 
         # Return list with keys being pressed
@@ -87,10 +88,12 @@ class Player(pygame.sprite.Sprite):
             # Gravity calculation
             self.on_ground = on_ground
             if not on_ground:
-                self.speed.y += self.gravity_strength * (1 + dt)
+                self.gravity_strength *= 1 + dt # Correct gravity with dt so jumping is framerate independent
+                self.speed.y += self.gravity_strength
                 if not self.timers["jump"].active: self.timers["jump"].activate()
             if on_ground:
                 self.speed.y = 0
+                self.gravity_strength = self.default_gravity
 
         # No ground collision test
         elif direction == "horizontal":
@@ -116,12 +119,11 @@ class Player(pygame.sprite.Sprite):
         self.collision("horizontal")
 
         # Vertical movement
-        self.pos.y += self.speed.y * dt
+        self.pos.y += self.speed.y # We do not multiply by dt here since the gravity is increased by dt
         self.hitbox.centery = round(self.pos.y)
         self.rect.centery = self.hitbox.centery
         # Vertical collision, True because we want to do a ground collision test at the end
         self.collision("vertical", dt)
-        self.speed.y *= 1 - dt
 
 
     def import_assets(self):
@@ -143,7 +145,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, dt):
         # Collect player input
-        self.input()
+        self.input(dt)
         self.update_timers()
         # Move player
         self.move(dt)

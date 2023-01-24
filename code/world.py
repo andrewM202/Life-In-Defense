@@ -53,12 +53,23 @@ class World:
         chunks_to_delete = []
 
         for key in self.chunks.keys():
-            player_chunk_distance = max([
+            player_chunk_distance_width = max([
                 abs(player_position[0] - (key[0] * Chunk_Tile_Width * Tile_Size)),
                 abs(player_position[0] - ((key[0] + 1 ) * Chunk_Tile_Width * Tile_Size))
             ])
 
-            if player_chunk_distance > Screen_Width * 2.5:
+            if player_chunk_distance_width > Screen_Width * 2:
+                # If the chunk crosses the threshold, add it to delete.
+                # We can't delete it here; will cause an error since we would be
+                # deleting from self.chunks while we are looping through it
+                chunks_to_delete.append(key)
+
+            player_chunk_distance_height = max([
+                abs(player_position[1] - (key[1] * Chunk_Tile_Height * Tile_Size)),
+                abs(player_position[1] - ((key[1] + 1 ) * Chunk_Tile_Height * Tile_Size))
+            ])
+
+            if player_chunk_distance_height > Screen_Height * 2:
                 # If the chunk crosses the threshold, add it to delete.
                 # We can't delete it here; will cause an error since we would be
                 # deleting from self.chunks while we are looping through it
@@ -71,6 +82,9 @@ class World:
         chunks_range_x = (player_position[0] - int(2 * Screen_Width), player_position[0] + int(1.2 * Screen_Width)) 
         chunks_range_y = (player_position[1] - int(2 * Screen_Height), player_position[1] + int(1.2 * Screen_Height)) 
         chunks_to_load = []
+        # print(chunks_range_y)
+        # print(player_position[1])
+        # print()
 
         for x in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
             for y in range(player_position[1], chunks_range_y[0], -Chunk_Pixel_Height):
@@ -78,11 +92,11 @@ class World:
                 if chunk_pos not in chunks_to_load:
                     chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
 
-        for i in range(player_position[0], chunks_range_x[1], Chunk_Pixel_Width):
-            for i in range(player_position[1], chunks_range_y[1], Chunk_Pixel_Height):
-                chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
-                if chunk_pos not in chunks_to_load:
-                    chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
+        # for x in range(player_position[0], chunks_range_x[1], Chunk_Pixel_Width):
+        #     for y in range(player_position[1], chunks_range_y[1], Chunk_Pixel_Height):
+        #         chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
+        #         if chunk_pos not in chunks_to_load:
+        #             chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
 
         for chunk_position in chunks_to_load:
             if chunk_position not in self.chunks:
@@ -104,6 +118,11 @@ class World:
                         str = ""
                         for pos in self.chunks: str+= f"{pos}, "
                         print(str)
+
+
+        # str = ""
+        # for chunk in self.chunks.keys(): str += f"({chunk[0]}, {chunk[1]}), "
+        # print(str)
                 
 
 
@@ -138,17 +157,25 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.x = player.rect.centerx - Screen_Width / 2
         self.offset.y = player.rect.centery - Screen_Height / 2
 
+        window_left_border = player.rect.centerx - (Screen_Width / 2)
+        window_top_border = player.rect.centery + (Screen_Height / 2)
+
+        window_rect = pygame.Rect(window_left_border, window_top_border, Screen_Width, Screen_Height)
+
         for layer in Layers.values():
             # Loop through all of our sprites, sorting them so player can appear behind
             # objects
             for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
+                # Check if this sprite is off window; if it is don't draw it
+                if collision_sprites.has(sprite):
+                    if window_rect.collidepoint(sprite.position):
+                        continue
                 if sprite.z == layer:
                     # Make a rect of the player's offset then subtract it 
                     # from the sprite's position to make effect of movement
                     offset_rect = sprite.rect.copy()
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
-
 
                     # BLOCK BREAKING
                     if offset_rect.collidepoint((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) and collision_sprites.has(sprite):
@@ -164,5 +191,4 @@ class CameraGroup(pygame.sprite.Group):
                         # If mouseover and click delete block
                         if pygame.mouse.get_pressed()[0]:
                             pygame.sprite.Sprite.kill(sprite)
-
-
+                            

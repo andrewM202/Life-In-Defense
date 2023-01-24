@@ -4,8 +4,6 @@ from sprites import GroundBlock
 # import pygame
 from pygame.sprite import Sprite
 from ast import literal_eval # Used for converting our .py chunk files from strings into dictionaries
-import threading # Multithreading
-from numba import njit
 
 class Chunk():
     def __init__(self, all_sprites, collision_sprites, block_surfs, ground_level = 6, chunk_position=(0 ,0), load_from_file = False):
@@ -36,12 +34,10 @@ class Chunk():
             self.noise = generate_fractal_noise_2d((Screen_Tile_Width, Screen_Tile_Height), (4, 4))
 
             # Generate the chunk
-            # self.generate()
-            threading.Thread(target=self.generate, args=()).start()
+            self.generate()
         else:
             # Load chunk from file
-            # self.load_chunk()
-            threading.Thread(target=self.load_chunk, args=()).start()
+            self.load_chunk()
 
     def __del__(self):
         """ Destructor, free memory """
