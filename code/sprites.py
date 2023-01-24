@@ -18,6 +18,8 @@ class Block(GenericSprite):
         super().__init__(position, surface, groups)
         self.hitbox = self.rect.copy()
         self.block_id = block_id
+        self.mouse_hover = False # Check if we are hovering over the sprite
+        self.surf_storage = surface # Used for when we go back to original surface after replacing with anothre during mouse hover
 
 
 class GroundBlock(Block):

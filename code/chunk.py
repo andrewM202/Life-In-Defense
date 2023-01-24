@@ -60,7 +60,7 @@ class Chunk():
                     tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
 
                     # If there is no block above make this a top block
-                    if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y * self.chunk_position.y == self.ground_level:
+                    if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y * self.chunk_position.y == self.ground_level or y == self.ground_level and self.chunk_position.y == 0:
                         # If no block to the left
                         block = GroundBlock(
                             position = (tile_world_pos.x, tile_world_pos.y), 

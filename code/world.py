@@ -113,7 +113,7 @@ class World:
         self.display_surface.fill(sky_bg_color)
 
         # Draw player
-        self.all_sprites.custom_draw(self.player)
+        self.all_sprites.custom_draw(self.player, self.collision_sprites)
 
         # Manage our chunks
         self.manage_chunks()
@@ -129,7 +129,10 @@ class CameraGroup(pygame.sprite.Group):
         self.display_surface = pygame.display.get_surface()
         self.offset = pygame.math.Vector2()
 
-    def custom_draw(self, player):
+    def custom_draw(self, player, collision_sprites):
+        """ This method draws the sprites in the correct order
+        and handles block placement / breaking """
+
         # Get position of player, then calculate the offset 
         # of the player into the center of the screen
         self.offset.x = player.rect.centerx - Screen_Width / 2
@@ -146,5 +149,20 @@ class CameraGroup(pygame.sprite.Group):
                     offset_rect.center -= self.offset
                     self.display_surface.blit(sprite.image, offset_rect)
 
+
+                    # BLOCK BREAKING
+                    if offset_rect.collidepoint((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) and collision_sprites.has(sprite):
+                        sprite.mouse_hover = True
+                        # Create mask for sprite
+                        mask = pygame.mask.from_surface(sprite.image)
+                        for point in mask.outline():
+                            # print(sprite.image.get_height())
+                            x = point[0] + offset_rect.x
+                            y = point[1] + offset_rect.y
+                            pygame.draw.circle(pygame.display.get_surface(), "gray", (x,y), 2)
+
+                        # If mouseover and click delete block
+                        if pygame.mouse.get_pressed()[0]:
+                            pygame.sprite.Sprite.kill(sprite)
 
 

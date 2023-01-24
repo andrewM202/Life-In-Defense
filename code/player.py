@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from support import import_folder
 from timer import *
+from pygame.sprite import Sprite
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, position, group, collision_sprites):
@@ -54,7 +55,8 @@ class Player(pygame.sprite.Sprite):
             self.speed.y = -self.jump_strength
 
 
-    def collision(self, direction):
+
+    def collision(self, direction, dt=None):
         """ Handle player collision with collision sprites,
         and check if player is on ground for gravity """
 
@@ -85,7 +87,7 @@ class Player(pygame.sprite.Sprite):
             # Gravity calculation
             self.on_ground = on_ground
             if not on_ground:
-                self.speed.y += self.gravity_strength
+                self.speed.y += self.gravity_strength * (1 + dt)
                 if not self.timers["jump"].active: self.timers["jump"].activate()
             if on_ground:
                 self.speed.y = 0
@@ -104,8 +106,6 @@ class Player(pygame.sprite.Sprite):
                         self.rect.centerx = self.hitbox.centerx
                         self.pos.x = self.hitbox.centerx
                     
-                            
-
 
     def move(self, dt):
         # Horizontal movement
@@ -120,7 +120,7 @@ class Player(pygame.sprite.Sprite):
         self.hitbox.centery = round(self.pos.y)
         self.rect.centery = self.hitbox.centery
         # Vertical collision, True because we want to do a ground collision test at the end
-        self.collision("vertical")
+        self.collision("vertical", dt)
         self.speed.y *= 1 - dt
 
 
@@ -147,3 +147,6 @@ class Player(pygame.sprite.Sprite):
         self.update_timers()
         # Move player
         self.move(dt)
+
+
+
