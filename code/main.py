@@ -6,7 +6,7 @@ from world import World
 class Game():
     def __init__(self):
         pygame.init()
-        flags = pygame.RESIZABLE# | pygame.FULLSCREEN
+        flags = pygame.RESIZABLE | pygame.FULLSCREEN
         self.screen = pygame.display.set_mode((Screen_Width, Screen_Height), flags)
         self.clock = pygame.time.Clock()
 		# window title
@@ -20,16 +20,6 @@ class Game():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
-                if event.type == pygame.WINDOWRESIZED:
-                    # Resize to closest interval of tile size
-                    x, y = self.screen.get_size()
-                    # print(x, y)
-                    Screen_Width, Screen_Height = x, y
-                    Screen_Tile_Width  = int(round(Screen_Width / Tile_Size))
-                    Screen_Tile_Height = int(round(Screen_Height / Tile_Size))
-                    Chunk_Tile_Width, Chunk_Tile_Height = Screen_Tile_Width, Screen_Tile_Height
-                    Chunk_Pixel_Width, Chunk_Pixel_Height = Chunk_Tile_Width * Tile_Size, Chunk_Tile_Height * Tile_Size
-                    print(Screen_Width, Screen_Height)
 
 
             # If the place presses esc close game  
