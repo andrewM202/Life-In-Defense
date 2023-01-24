@@ -4,7 +4,8 @@ from sprites import GroundBlock
 # import pygame
 from pygame.sprite import Sprite
 from ast import literal_eval # Used for converting our .py chunk files from strings into dictionaries
-
+import threading # Multithreading
+from numba import njit
 
 class Chunk():
     def __init__(self, all_sprites, collision_sprites, block_surfs, ground_level = 6, chunk_position=(0 ,0), load_from_file = False):
@@ -35,13 +36,12 @@ class Chunk():
             self.noise = generate_fractal_noise_2d((Screen_Tile_Width, Screen_Tile_Height), (4, 4))
 
             # Generate the chunk
-            self.generate()
-
-            # Store our chunk data permanently in a new directory
-            self.store_data()
+            # self.generate()
+            threading.Thread(target=self.generate, args=()).start()
         else:
             # Load chunk from file
-            self.load_chunk()
+            # self.load_chunk()
+            threading.Thread(target=self.load_chunk, args=()).start()
 
     def __del__(self):
         """ Destructor, free memory """
@@ -62,21 +62,22 @@ class Chunk():
                     # If there is no block above make this a top block
                     if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y * self.chunk_position.y == self.ground_level or y == self.ground_level and self.chunk_position.y == 0:
                         # If no block to the left
-                        block = GroundBlock(
+                        self.chunk_tiles.append(GroundBlock(
                             position = (tile_world_pos.x, tile_world_pos.y), 
                             surface  = self.blocks[Block_Ids["ground_top"]], 
                             groups   = [self.all_sprites, self.collision_sprites], 
                             block_id = Block_Ids["ground_top"]
-                        )
-                        self.chunk_tiles.append(block)
+                        ))
                     else:
-                        block = GroundBlock(
+                        self.chunk_tiles.append(GroundBlock(
                             position =  (tile_world_pos.x, tile_world_pos.y), 
                             surface  = self.blocks[Block_Ids["ground_center"]], 
                             groups   = [self.all_sprites, self.collision_sprites], 
                             block_id = Block_Ids["ground_center"]
-                        )
-                        self.chunk_tiles.append(block)
+                        ))
+        
+        # Store the chunk data in a file
+        self.store_data()
 
     def load_chunk(self):
         """ Load the chunk from a file """
