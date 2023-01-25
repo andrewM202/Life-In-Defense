@@ -32,6 +32,7 @@ class Chunk():
         if not load_from_file:
             # Create the noies for the chunk
             self.noise = generate_fractal_noise_2d((Screen_Tile_Width, Screen_Tile_Height), (4, 4))
+            self.height_map = generate_fractal_noise_2d((Screen_Tile_Width, 2), (2, 2))
 
             # Generate the chunk
             self.generate()
@@ -49,6 +50,8 @@ class Chunk():
     def generate(self):
         """ Generate the actual chunk """
         for x in range(0, Screen_Tile_Width):
+            self.ground_level = int(self.height_map[x][0] * 16)
+            print( self.ground_level )
             for y in range(0, Screen_Tile_Height):
                 if self.noise[x][y] >= Block_Gen_Threshold and (y >= self.ground_level and self.chunk_position.y == 0 or self.chunk_position.y > 0):
                     # Calculate the local and world coordinates of this tile
@@ -56,7 +59,8 @@ class Chunk():
                     tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
 
                     # If there is no block above make this a top block
-                    if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y == self.ground_level and self.chunk_position.y == 0:
+                    # if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y == self.ground_level and self.chunk_position.y == 0:
+                    if self.noise[x][y-1] < Block_Gen_Threshold or y <= self.ground_level and self.chunk_position.y == 0:
                         # If no block to the left
                         self.chunk_tiles.append(GroundBlock(
                             position = (tile_world_pos.x, tile_world_pos.y), 

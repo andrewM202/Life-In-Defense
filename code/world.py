@@ -157,10 +157,14 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.x = player.rect.centerx - Screen_Width / 2
         self.offset.y = player.rect.centery - Screen_Height / 2
 
-        window_left_border = player.rect.centerx - (Screen_Width / 2)
-        window_top_border = player.rect.centery + (Screen_Height / 2)
+        window_left_border = player.rect.centerx - (Screen_Width / 2) - Tile_Size
+        window_top_border = player.rect.centery - (Screen_Height / 2) - Tile_Size
 
-        window_rect = pygame.Rect(window_left_border, window_top_border, Screen_Width, Screen_Height)
+        # print(player.rect.centerx, player.rect.centery)
+        # print(window_left_border, window_top_border)
+        # print()
+
+        window_rect = pygame.Rect(window_left_border, window_top_border, Screen_Width + Tile_Size, Screen_Height + Tile_Size)
 
         for layer in Layers.values():
             # Loop through all of our sprites, sorting them so player can appear behind
@@ -168,7 +172,7 @@ class CameraGroup(pygame.sprite.Group):
             for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
                 # Check if this sprite is off window; if it is don't draw it
                 if collision_sprites.has(sprite):
-                    if window_rect.collidepoint(sprite.position):
+                    if not window_rect.collidepoint(sprite.position):
                         continue
                 if sprite.z == layer:
                     # Make a rect of the player's offset then subtract it 

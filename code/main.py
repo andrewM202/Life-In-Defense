@@ -6,7 +6,7 @@ from world import World
 class Game():
     def __init__(self):
         pygame.init()
-        flags = pygame.RESIZABLE | pygame.FULLSCREEN
+        flags = pygame.RESIZABLE #| pygame.FULLSCREEN
         self.screen = pygame.display.set_mode((Screen_Width, Screen_Height), flags)
         self.clock = pygame.time.Clock()
 		# window title
