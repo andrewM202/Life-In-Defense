@@ -27,7 +27,7 @@ class World:
         self.load_blocks()
 
         # Create player
-        self.player = Player((600, self.ground_level * Tile_Size), self.all_sprites, self.collision_sprites)
+        self.player = Player((0, 0), self.all_sprites, self.collision_sprites)
 
         # Reset world for now by deleting all files in chunks folder, will delete later
         if New_World:
@@ -159,10 +159,6 @@ class CameraGroup(pygame.sprite.Group):
 
         window_left_border = player.rect.centerx - (Screen_Width / 2) - Tile_Size
         window_top_border = player.rect.centery - (Screen_Height / 2) - Tile_Size
-
-        # print(player.rect.centerx, player.rect.centery)
-        # print(window_left_border, window_top_border)
-        # print()
 
         window_rect = pygame.Rect(window_left_border, window_top_border, Screen_Width + Tile_Size, Screen_Height + Tile_Size)
 

@@ -51,16 +51,14 @@ class Chunk():
         """ Generate the actual chunk """
         for x in range(0, Screen_Tile_Width):
             self.ground_level = int(self.height_map[x][0] * 16)
-            print( self.ground_level )
             for y in range(0, Screen_Tile_Height):
-                if self.noise[x][y] >= Block_Gen_Threshold and (y >= self.ground_level and self.chunk_position.y == 0 or self.chunk_position.y > 0):
+                if self.noise[x][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.ground_level):
                     # Calculate the local and world coordinates of this tile
                     tile_local_pos = Vector2(x * Tile_Size, y * Tile_Size)
                     tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
 
                     # If there is no block above make this a top block
-                    # if (y > 0 and self.noise[x][y-1] < Block_Gen_Threshold) or y == self.ground_level and self.chunk_position.y == 0:
-                    if self.noise[x][y-1] < Block_Gen_Threshold or y <= self.ground_level and self.chunk_position.y == 0:
+                    if not (self.noise[x][y-1] >= Block_Gen_Threshold and (y-1) * Tile_Size + self.chunk_offset_y >= int(self.ground_level)):
                         # If no block to the left
                         self.chunk_tiles.append(GroundBlock(
                             position = (tile_world_pos.x, tile_world_pos.y), 
