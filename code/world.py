@@ -4,6 +4,8 @@ from player import Player
 from chunk import Chunk
 from pygame.math import Vector2
 from os import listdir, remove, path
+from sprites import GroundBlock
+from random import choice
 
 
 
@@ -13,10 +15,6 @@ class World:
         # Get display surface
         self.display_surface = pygame.display.get_surface()
 
-        # Sprite groups
-        self.all_sprites = CameraGroup()
-        self.collision_sprites = pygame.sprite.Group()
-
         # Chunks
         # Level the ground will spawn at when generating chunks
         self.ground_level = 12
@@ -25,6 +23,11 @@ class World:
         # Load blocks
         self.blocks = {}
         self.load_blocks()
+
+        # Sprite groups
+        self.collision_sprites = pygame.sprite.Group()
+        self.all_sprites = CameraGroup()
+        self.all_sprites.set_attributes(self.collision_sprites, self.all_sprites, self.blocks)
 
         # Create player
         self.player = Player((0, 0), self.all_sprites, self.collision_sprites)
@@ -82,21 +85,11 @@ class World:
         chunks_range_x = (player_position[0] - int(2 * Screen_Width), player_position[0] + int(1.2 * Screen_Width)) 
         chunks_range_y = (player_position[1] - int(2 * Screen_Height), player_position[1] + int(1.2 * Screen_Height)) 
         chunks_to_load = []
-        # print(chunks_range_y)
-        # print(player_position[1])
-        # print()
-
         for x in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
             for y in range(player_position[1], chunks_range_y[0], -Chunk_Pixel_Height):
                 chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
                 if chunk_pos not in chunks_to_load:
                     chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
-
-        # for x in range(player_position[0], chunks_range_x[1], Chunk_Pixel_Width):
-        #     for y in range(player_position[1], chunks_range_y[1], Chunk_Pixel_Height):
-        #         chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
-        #         if chunk_pos not in chunks_to_load:
-        #             chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))
 
         for chunk_position in chunks_to_load:
             if chunk_position not in self.chunks:
@@ -118,11 +111,6 @@ class World:
                         str = ""
                         for pos in self.chunks: str+= f"{pos}, "
                         print(str)
-
-
-        # str = ""
-        # for chunk in self.chunks.keys(): str += f"({chunk[0]}, {chunk[1]}), "
-        # print(str)
                 
 
 
@@ -132,7 +120,8 @@ class World:
         self.display_surface.fill(sky_bg_color)
 
         # Draw player
-        self.all_sprites.custom_draw(self.player, self.collision_sprites)
+        # self.all_sprites.custom_draw(self.player, self.collision_sprites, self.all_sprites, self.blocks)
+        self.all_sprites.custom_draw(self.player)
 
         # Manage our chunks
         self.manage_chunks()
@@ -148,7 +137,13 @@ class CameraGroup(pygame.sprite.Group):
         self.display_surface = pygame.display.get_surface()
         self.offset = pygame.math.Vector2()
 
-    def custom_draw(self, player, collision_sprites):
+    def set_attributes(self, collision_sprites, all_sprites, blocks):
+        self.collision_sprites = collision_sprites
+        self.all_sprites = all_sprites
+        self.blocks = blocks
+
+    # def custom_draw(self, player, collision_sprites, all_sprites, blocks):
+    def custom_draw(self, player):
         """ This method draws the sprites in the correct order
         and handles block placement / breaking """
 
@@ -167,7 +162,7 @@ class CameraGroup(pygame.sprite.Group):
             # objects
             for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
                 # Check if this sprite is off window; if it is don't draw it
-                if collision_sprites.has(sprite):
+                if self.collision_sprites.has(sprite):
                     if not window_rect.collidepoint(sprite.position):
                         continue
                 if sprite.z == layer:
@@ -178,7 +173,7 @@ class CameraGroup(pygame.sprite.Group):
                     self.display_surface.blit(sprite.image, offset_rect)
 
                     # BLOCK BREAKING
-                    if offset_rect.collidepoint((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) and collision_sprites.has(sprite):
+                    if offset_rect.collidepoint((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])) and self.collision_sprites.has(sprite):
                         sprite.mouse_hover = True
                         # Create mask for sprite
                         mask = pygame.mask.from_surface(sprite.image)
@@ -189,7 +184,18 @@ class CameraGroup(pygame.sprite.Group):
                             pygame.draw.circle(pygame.display.get_surface(), "gray", (x,y), 2)
 
                         # If mouseover and click delete block
-                        if pygame.mouse.get_pressed()[0]:
+                        if pygame.mouse.get_pressed()[0]: # Left click
                             pygame.sprite.Sprite.kill(sprite)
-                            
+
+                        if pygame.mouse.get_pressed()[2]: # Riight click
+                            # Pick a random center ground variant
+                            id = f"ground_center_{choice([1, 1, 1, 1, 2, 3, 4])}"
+                            # GroundBlock(
+                            #     position =  (sprite.position[0], sprite.position[1]), 
+                            #     surface  = self.blocks[Block_Ids[id]], 
+                            #     groups   = [self.all_sprites, self.collision_sprites], 
+                            #     block_id = Block_Ids[id]
+                            # )
+                            sprite.surface = self.blocks[Block_Ids[id]]
+                            sprite.block_id = Block_Ids[id]
                             
