@@ -24,7 +24,9 @@ Layers = {
 
 Block_Ids = {
     "ground_top": 0,
-    "ground_center": 1
+    "ground_center": 1,
+    "ground_top_left": 2,
+    "ground_top_right": 3
 }
 
 New_World = True
