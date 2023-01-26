@@ -20,6 +20,11 @@ class World:
         self.ground_level = 12
         self.chunks = {}
 
+        # Background
+        self.bg = pygame.image.load("../graphics/background/background_glacial_mountains.png").convert_alpha()
+        # self.bg = pygame.image.load("../graphics/background/forest.png").convert_alpha()
+        self.bg = pygame.transform.scale(self.bg, (Screen_Width, Screen_Height))
+
         # Load blocks
         self.blocks = {}
         self.load_blocks()
@@ -115,9 +120,10 @@ class World:
 
 
     def run(self, dt):
-        # Set background color 
-        sky_bg_color = (92, 76, 255)
-        self.display_surface.fill(sky_bg_color)
+        # Set background
+        # sky_bg_color = (92, 76, 255)
+        # self.display_surface.fill(sky_bg_color)
+        self.display_surface.blit(self.bg, (0, 0))
 
         # Draw player
         # self.all_sprites.custom_draw(self.player, self.collision_sprites, self.all_sprites, self.blocks)
