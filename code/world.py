@@ -192,3 +192,4 @@ class CameraGroup(pygame.sprite.Group):
                         if pygame.mouse.get_pressed()[0]:
                             pygame.sprite.Sprite.kill(sprite)
                             
+                            

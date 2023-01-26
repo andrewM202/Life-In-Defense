@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(group)
 
         self.import_assets()
-        self.animation_status = "down_idle" # Player's current animation state
+        self.animation_status = "ready" # Player's current animation state
         self.frame_index = 0 # The current frame of the current animation state
 
         # General setup
@@ -37,6 +37,20 @@ class Player(pygame.sprite.Sprite):
         }
 
 
+    def animate(self, dt):
+        """ Create the player animations """
+
+        # Increment our frame index by an arbitrary amount: 4
+        self.frame_index = self.frame_index + 6 * dt
+
+        # If wour frame goes over the amount of animation states we have, 
+        # reset it to 0 so we restart the animation
+        if self.frame_index >= len(self.animations[self.animation_status]):
+            self.frame_index = 0
+
+        self.image = self.animations[self.animation_status][int(self.frame_index)]
+
+
     def input(self, dt):
         """ Handles player input """
 
@@ -46,15 +60,29 @@ class Player(pygame.sprite.Sprite):
         # Movement
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.speed.x = self.default_speed
+            if not self.timers["jump"].active:
+                if self.animation_status != "run_right": self.frame_index = 0
+                self.animation_status = "run_right"
+            else:
+                self.animation_status = "jump_right"
         elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.speed.x = -self.default_speed
+            if not self.timers["jump"].active:
+                if self.animation_status != "run_left": self.frame_index = 0
+                self.animation_status = "run_left"
+            else:
+                self.animation_status = "jump_left"
         else:
             self.speed.x = 0
+            if not self.timers["jump"].active:
+                if self.animation_status != "ready": self.frame_index = 0
+                self.animation_status = "ready"
 
         # Jump if on ground and timer not active
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground and not self.timers["jump"].active:
             self.speed.y = -self.jump_strength
-
+            if self.animation_status != "jump": self.frame_index = 0
+            self.animation_status = "jump_right" if self.speed.x > 0 else "jump_left"
 
 
     def collision(self, direction, dt=None):
@@ -128,7 +156,11 @@ class Player(pygame.sprite.Sprite):
 
     def import_assets(self):
         self.animations = {
-            "down_idle": []
+            "run_right": [],
+            "run_left": [],
+            "ready": [],
+            "jump_right": [],
+            "jump_left": [],
         }
 
         for animation in self.animations.keys():
@@ -149,6 +181,7 @@ class Player(pygame.sprite.Sprite):
         self.update_timers()
         # Move player
         self.move(dt)
+        self.animate(dt)
 
 
 
