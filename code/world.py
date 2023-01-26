@@ -188,14 +188,18 @@ class CameraGroup(pygame.sprite.Group):
                             pygame.sprite.Sprite.kill(sprite)
 
                         if pygame.mouse.get_pressed()[2]: # Riight click
-                            # Pick a random center ground variant
-                            id = f"ground_center_{choice([1, 1, 1, 1, 2, 3, 4])}"
-                            # GroundBlock(
-                            #     position =  (sprite.position[0], sprite.position[1]), 
-                            #     surface  = self.blocks[Block_Ids[id]], 
-                            #     groups   = [self.all_sprites, self.collision_sprites], 
-                            #     block_id = Block_Ids[id]
-                            # )
+                            # Pick a random blocks
+                            id = choice([i for i in Block_Ids.values()])
+                            for block in Block_Ids.items():
+                                if block[1] == id:
+                                    id = block[0]
+                            pygame.sprite.Sprite.kill(sprite)
+                            GroundBlock(
+                                position =  (sprite.position[0], sprite.position[1]), 
+                                surface  = self.blocks[Block_Ids[id]], 
+                                groups   = [self.all_sprites, self.collision_sprites], 
+                                block_id = Block_Ids[id]
+                            )
                             sprite.surface = self.blocks[Block_Ids[id]]
                             sprite.block_id = Block_Ids[id]
                             
