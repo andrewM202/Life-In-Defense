@@ -4,6 +4,7 @@ from sprites import GroundBlock
 # import pygame
 from pygame.sprite import Sprite
 from ast import literal_eval # Used for converting our .py chunk files from strings into dictionaries
+from random import choice
 
 class Chunk():
     def __init__(self, all_sprites, collision_sprites, block_surfs, ground_level = 6, chunk_position=(0 ,0), load_from_file = False):
@@ -92,11 +93,13 @@ class Chunk():
                                 block_id = Block_Ids["ground_top"]
                             ))
                     else:
+                        # Pick a random center ground variant
+                        id = f"ground_center_{choice([1, 1, 1, 1, 2, 3, 4])}"
                         self.chunk_tiles.append(GroundBlock(
                             position =  (tile_world_pos.x, tile_world_pos.y), 
-                            surface  = self.blocks[Block_Ids["ground_center"]], 
+                            surface  = self.blocks[Block_Ids[id]], 
                             groups   = [self.all_sprites, self.collision_sprites], 
-                            block_id = Block_Ids["ground_center"]
+                            block_id = Block_Ids[id]
                         ))
         
         # Store the chunk data in a file

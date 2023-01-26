@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
         super().__init__(group)
 
         self.import_assets()
-        self.animation_status = "ready" # Player's current animation state
+        self.animation_status = "ready_right" # Player's current animation state
         self.frame_index = 0 # The current frame of the current animation state
 
         # General setup
@@ -73,10 +73,15 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.animation_status = "jump_left"
         else:
-            self.speed.x = 0
             if not self.timers["jump"].active:
-                if self.animation_status != "ready": self.frame_index = 0
-                self.animation_status = "ready"
+                if self.animation_status not in ["ready_right", "ready_left"]: self.frame_index = 0
+                if self.animation_status not in ["ready_right", "ready_left"]: 
+                    if self.speed.x > 0 or self.animation_status in ["jump_right"]:
+                        self.animation_status = "ready_right"
+                    elif self.speed.x <= 0:
+                        self.animation_status = "ready_left"
+
+            self.speed.x = 0
 
         # Jump if on ground and timer not active
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground and not self.timers["jump"].active:
@@ -158,7 +163,8 @@ class Player(pygame.sprite.Sprite):
         self.animations = {
             "run_right": [],
             "run_left": [],
-            "ready": [],
+            "ready_right": [],
+            "ready_left": [],
             "jump_right": [],
             "jump_left": [],
         }

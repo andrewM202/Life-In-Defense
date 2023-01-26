@@ -23,11 +23,19 @@ Layers = {
 }
 
 Block_Ids = {
-    "ground_top": 0,
-    "ground_center": 1,
-    "ground_top_left": 2,
-    "ground_top_right": 3
+    "ground_top": None,
+    "ground_center_1": None,
+    "ground_center_2": None,
+    "ground_center_3": None,
+    "ground_center_4": None,
+    "ground_top_left": None,
+    "ground_top_right": None,
 }
+
+index = 0
+for block_id in Block_Ids:
+    Block_Ids[block_id] = index
+    index += 1
 
 New_World = True
 
