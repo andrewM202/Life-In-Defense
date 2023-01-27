@@ -30,6 +30,7 @@ Block_Ids = {
     "ground_center_4": None,
     "ground_top_left": None,
     "ground_top_right": None,
+    "ground_center_top_left": None
 }
 
 index = 0
