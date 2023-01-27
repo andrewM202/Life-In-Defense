@@ -5,6 +5,7 @@ from sprites import GroundBlock
 from pygame.sprite import Sprite
 from ast import literal_eval # Used for converting our .py chunk files from strings into dictionaries
 from random import choice
+from threading import Thread
 
 class Chunk():
     def __init__(self, all_sprites, collision_sprites, block_surfs, ground_level = 6, chunk_position=(0 ,0), load_from_file = False):
@@ -37,6 +38,10 @@ class Chunk():
 
             # Generate the chunk
             self.generate()
+
+            # Store the chunk data in a file
+            # self.store_data()
+            Thread(target=self.store_data, args=()).start()
         else:
             # Load chunk from file
             self.load_chunk()
@@ -102,9 +107,6 @@ class Chunk():
                             block_id = Block_Ids[id]
                         ))
         
-        # Store the chunk data in a file
-        self.store_data()
-
     def load_chunk(self):
         """ Load the chunk from a file """
         relative_path = f"../world/chunks/{int(self.chunk_position.x)},{int(self.chunk_position.y)}.py"

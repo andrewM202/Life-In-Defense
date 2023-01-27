@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 from settings import *
 from world import World
+from startmenu import StartMenu
 
 class Game():
     def __init__(self):
@@ -14,6 +15,7 @@ class Game():
         pygame.display.set_caption('Life In Defense')
 		# Initialize the world
         self.world = World()
+        self.startmenu = StartMenu()
 
     def run(self):
         while True:
@@ -30,8 +32,13 @@ class Game():
 
 
             dt = self.clock.tick() / 1000
-			# Run our World
-            self.world.run(dt)
+
+            if self.startmenu.load_world:
+                # Run our World
+                self.world.run(dt)
+            else:
+                self.startmenu.display()
+
             pygame.display.update()
 
 if __name__ == "__main__":
