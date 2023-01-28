@@ -83,15 +83,19 @@ class World:
                 # deleting from self.chunks while we are looping through it
                 chunks_to_delete.append(key)
 
+        # Delete the selected chunks from memory
         for key in chunks_to_delete:
             del self.chunks[key]
 
         # Restore chunks that are within 2 screen widths or heights of the player
-        chunks_range_x = (player_position[0] - int(2 * Screen_Width), player_position[0] + int(1.2 * Screen_Width)) 
-        chunks_range_y = (player_position[1] - int(2 * Screen_Height), player_position[1] + int(1.2 * Screen_Height)) 
+        chunks_range_x = (player_position[0] - int(0.6 * Screen_Width), player_position[0] + int(0.6 * Screen_Width)) 
+        chunks_range_y = (player_position[1] - int(0.6 * Screen_Height), player_position[1] + int(0.6 * Screen_Height)) 
         chunks_to_load = []
-        for x in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
-            for y in range(player_position[1], chunks_range_y[0], -Chunk_Pixel_Height):
+        # print(player_position[0], chunks_range_x[0])
+        # for x in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
+        #     for y in range(player_position[1], chunks_range_y[0], -Chunk_Pixel_Height):
+        for x in range(chunks_range_x[0], chunks_range_x[1], Chunk_Pixel_Width):
+            for y in range(chunks_range_y[0], chunks_range_y[1], Chunk_Pixel_Height):
                 chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))
                 if chunk_pos not in chunks_to_load:
                     chunks_to_load.append((round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height)))

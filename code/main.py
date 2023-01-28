@@ -8,7 +8,7 @@ class Game():
     def __init__(self):
         pygame.init()
         flags = 0#pygame.RESIZABLE #| pygame.FULLSCREEN
-        # flags = pygame.FULLSCREEN
+        flags = pygame.FULLSCREEN
         self.screen = pygame.display.set_mode((Screen_Width, Screen_Height), flags)
         self.clock = pygame.time.Clock()
 		# window title

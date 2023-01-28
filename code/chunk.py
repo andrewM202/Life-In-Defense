@@ -32,7 +32,7 @@ class Chunk():
         # The tiles in our chunk
         self.chunk_tiles = {}
         # The sprites in our chunk
-        self.chunk_sprites = []
+        self.chunk_sprites = {}
 
         if not load_from_file:
             # Create the noies for the chunk
@@ -43,8 +43,8 @@ class Chunk():
             self.generate()
 
             # Store the chunk data in a file
-            self.store_data()
-            # Thread(target=self.store_data, args=()).start()
+            # self.store_data()
+            Thread(target=self.store_data, args=()).start()
         else:
             # Load chunk from file
             self.load_chunk()
@@ -53,7 +53,7 @@ class Chunk():
         """ Destructor, free memory """
         if Chunk_Logging:
             print(f"Deleting chunk {self.chunk_position.x}, {self.chunk_position.y}")
-        for sprite in self.chunk_sprites:
+        for sprite in self.chunk_sprites.values():
             Sprite.kill(sprite)
 
     def generate(self):
@@ -63,57 +63,99 @@ class Chunk():
             for y in range(0, Screen_Tile_Height):
                 if self.noise[x][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= self.ground_level:
                     # Calculate the local and world coordinates of this tile
-                    tile_local_pos = Vector2(x * Tile_Size, y * Tile_Size)
-                    tile_world_pos = Vector2(tile_local_pos.x + self.chunk_offset_x, tile_local_pos.y + self.chunk_offset_y)
+                    tile_local_pos = (x * Tile_Size, y * Tile_Size)
+                    tile_world_pos = (tile_local_pos[0] + self.chunk_offset_x, tile_local_pos[1] + self.chunk_offset_y)
 
                     # If there is no block above make this a top block
                     if not (self.noise[x][y-1] >= Block_Gen_Threshold and (y-1) * Tile_Size + self.chunk_offset_y >= self.ground_level):
                         try:
                             # If no block to the left
                             if not (self.noise[x-1][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.height_map[x-1][0] * 16)):
-                                self.chunk_sprites.append(GroundBlock(
-                                    position = (tile_world_pos.x, tile_world_pos.y), 
+                                self.chunk_sprites[tile_world_pos] = GroundBlock(
+                                    position = tile_world_pos, 
                                     surface  = self.blocks[Block_Ids["ground_top_left"]], 
                                     groups   = [self.all_sprites, self.collision_sprites], 
                                     block_id = Block_Ids["ground_top_left"]
-                                ))
-                                self.chunk_tiles[(tile_world_pos.x, tile_world_pos.y)] = Block_Ids["ground_top_left"]
+                                )
+                                self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top_left"]
                             # If no block to the right
                             elif not (self.noise[x+1][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.height_map[x+1][0] * 16)):
-                                self.chunk_sprites.append(GroundBlock(
-                                    position = (tile_world_pos.x, tile_world_pos.y), 
+                                self.chunk_sprites[tile_world_pos] = GroundBlock(
+                                    position = tile_world_pos, 
                                     surface  = self.blocks[Block_Ids["ground_top_right"]], 
                                     groups   = [self.all_sprites, self.collision_sprites], 
                                     block_id = Block_Ids["ground_top_right"]
-                                ))
-                                self.chunk_tiles[(tile_world_pos.x, tile_world_pos.y)] = Block_Ids["ground_top_right"]
+                                )
+                                self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top_right"]
                             # Else just top middle
                             else:
-                                self.chunk_sprites.append(GroundBlock(
-                                    position = (tile_world_pos.x, tile_world_pos.y), 
+                                self.chunk_sprites[tile_world_pos] = GroundBlock(
+                                    position = tile_world_pos, 
                                     surface  = self.blocks[Block_Ids["ground_top"]], 
                                     groups   = [self.all_sprites, self.collision_sprites], 
                                     block_id = Block_Ids["ground_top"]
-                                ))
-                                self.chunk_tiles[(tile_world_pos.x, tile_world_pos.y)] = Block_Ids["ground_top"]
+                                )
+                                self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top"]
                         except Exception as e:
-                            GroundBlock(
-                                position = (tile_world_pos.x, tile_world_pos.y), 
+                            self.chunk_sprites[tile_world_pos] = GroundBlock(
+                                position = tile_world_pos, 
                                 surface  = self.blocks[Block_Ids["ground_top"]], 
                                 groups   = [self.all_sprites, self.collision_sprites], 
                                 block_id = Block_Ids["ground_top"]
                             )
-                            self.chunk_tiles[(tile_world_pos.x, tile_world_pos.y)] = Block_Ids["ground_top"]
+                            self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top"]
                     else:
                         # Pick a random center ground variant
                         id = f"ground_center_{choice([1, 1, 1, 1, 2, 3, 4])}"
-                        self.chunk_sprites.append(GroundBlock(
-                            position =  (tile_world_pos.x, tile_world_pos.y), 
+                        self.chunk_sprites[tile_world_pos] = GroundBlock(
+                            position =  tile_world_pos, 
                             surface  = self.blocks[Block_Ids[id]], 
                             groups   = [self.all_sprites, self.collision_sprites], 
                             block_id = Block_Ids[id]
-                        ))
-                        self.chunk_tiles[(tile_world_pos.x, tile_world_pos.y)] = Block_Ids[id]
+                        )
+                        self.chunk_tiles[tile_world_pos] = Block_Ids[id]
+
+        # Make corner blocks correct
+        for position, block_id in self.chunk_tiles.items():
+            if block_id in [1, 2, 3, 4]: # Its a ground center variant
+                try:
+                    if(
+                        # The block above is grass
+                        self.chunk_tiles[(position[0], position[1]-Tile_Size)] in [0, 5, 6]
+                        # The block to the left is grass
+                        and self.chunk_tiles[(position[0]-Tile_Size, position[1])] in [0, 5, 6]
+                    ):
+                        Sprite.kill(self.chunk_sprites[position])
+                        self.chunk_sprites[tile_world_pos] = GroundBlock(
+                            position =  position, 
+                            surface  = self.blocks[Block_Ids["ground_center_top_left"]], 
+                            groups   = [self.all_sprites, self.collision_sprites], 
+                            block_id = Block_Ids["ground_center_top_left"]
+                        )
+                        # self.chunk_sprites[position].surface = self.blocks[Block_Ids["ground_center_top_left"]]
+                        # self.chunk_sprites[position].block_id = Block_Ids["ground_center_top_left"]
+                        self.chunk_tiles[position] = Block_Ids["ground_center_top_left"]
+                except Exception as e:
+                    pass
+                try:
+                    if(
+                        # The block above is grass
+                        self.chunk_tiles[(position[0], position[1]-Tile_Size)] in [0, 5, 6]
+                        # The block to the right is grass
+                        and self.chunk_tiles[(position[0]+Tile_Size, position[1])] in [0, 5, 6]
+                    ):
+                        Sprite.kill(self.chunk_sprites[position])
+                        self.chunk_sprites[tile_world_pos] = GroundBlock(
+                            position =  position, 
+                            surface  = self.blocks[Block_Ids["ground_center_top_right"]], 
+                            groups   = [self.all_sprites, self.collision_sprites], 
+                            block_id = Block_Ids["ground_center_top_right"]
+                        )
+                        # self.chunk_sprites[position].surface = self.blocks[Block_Ids["ground_center_top_left"]]
+                        # self.chunk_sprites[position].block_id = Block_Ids["ground_center_top_left"]
+                        self.chunk_tiles[position] = Block_Ids["ground_center_top_right"]
+                except Exception as e:
+                    pass
         
     def load_chunk(self):
         """ Load the chunk from a file """
@@ -129,12 +171,12 @@ class Chunk():
             tile_world_pos = (tile[0], tile[1])
 
             # Create our block
-            self.chunk_sprites.append(GroundBlock(
+            self.chunk_sprites[tile_world_pos] = GroundBlock(
                 position = tile_world_pos, 
                 surface  = self.blocks[chunk_data[tile]],
                 groups   = [self.all_sprites, self.collision_sprites], 
                 block_id = Block_Ids["ground_top"]
-            ))
+            )
             self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top"]
 
         # Close our file!
