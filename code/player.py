@@ -38,6 +38,7 @@ class Player(pygame.sprite.Sprite):
         self.timers = {
             "jump": Timer(250), # Cooldown on jumping
             "gui_toggle": Timer(250), # Cooldown on toggling the GUI
+            "debug_update": Timer(250) # Cooldown on updating the GUI
         }
 
 
@@ -199,7 +200,9 @@ class Player(pygame.sprite.Sprite):
         self.animate(dt)
         # Display overlay
         if self.display_debug:
-            self.overlay.display_debug(clock)
+            # Run our debug display, and only update the calculations if the timer is not active
+            self.overlay.display_debug(clock, True if not self.timers["debug_update"].active else False)
+            if not self.timers["debug_update"].active: self.timers["debug_update"].activate()
 
 
 
