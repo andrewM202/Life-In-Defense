@@ -120,7 +120,7 @@ class World:
                 
 
 
-    def run(self, dt):
+    def run(self, dt, clock):
         # Set background
         # sky_bg_color = (92, 76, 255)
         # self.display_surface.fill(sky_bg_color)
@@ -134,7 +134,7 @@ class World:
         self.manage_chunks()
 
         # Update our sprites
-        self.all_sprites.update(dt)
+        self.all_sprites.update(dt, clock)
 
 
 class CameraGroup(pygame.sprite.Group):

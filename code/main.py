@@ -36,7 +36,7 @@ class Game():
 
             if self.startmenu.load_world:
                 # Run our World
-                self.world.run(dt)
+                self.world.run(dt, self.clock)
             else:
                 self.startmenu.display()
 

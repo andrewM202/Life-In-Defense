@@ -3,6 +3,7 @@ from settings import *
 from support import import_folder
 from timer import *
 from pygame.sprite import Sprite
+from overlay import Overlay
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, position, group, collision_sprites):
@@ -16,6 +17,8 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.animation_status][self.frame_index]
         self.rect = self.image.get_rect(midbottom = position)
         self.z = Layers["player"]
+        self.overlay = Overlay(self)
+        self.display_debug = False
 
         # Movement attributes
         self.pos = pygame.math.Vector2(self.rect.center)
@@ -33,7 +36,8 @@ class Player(pygame.sprite.Sprite):
 
         # Timers
         self.timers = {
-            "jump": Timer(250) # Cooldown on jumping
+            "jump": Timer(250), # Cooldown on jumping
+            "gui_toggle": Timer(250), # Cooldown on toggling the GUI
         }
 
 
@@ -82,6 +86,11 @@ class Player(pygame.sprite.Sprite):
                         self.animation_status = "ready_left"
 
             self.speed.x = 0
+            
+        # Overlay
+        if keys[pygame.K_z] and not self.timers["gui_toggle"].active:
+            self.display_debug = not self.display_debug
+            self.timers["gui_toggle"].activate()
 
         # Jump if on ground and timer not active
         if (keys[pygame.K_SPACE] or keys[pygame.K_w] or keys[pygame.K_UP]) and self.on_ground and not self.timers["jump"].active:
@@ -181,13 +190,16 @@ class Player(pygame.sprite.Sprite):
                 self.timers[timer].update()
 
 
-    def update(self, dt):
+    def update(self, dt, clock):
         # Collect player input
         self.input(dt)
         self.update_timers()
         # Move player
         self.move(dt)
         self.animate(dt)
+        # Display overlay
+        if self.display_debug:
+            self.overlay.display_debug(clock)
 
 
 
