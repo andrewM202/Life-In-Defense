@@ -7,7 +7,8 @@ root = tkinter.Tk()
 root.withdraw()
 
 # Resolution
-Screen_Width, Screen_Height = root.winfo_screenwidth(), root.winfo_screenheight()#1360, 768
+Screen_Width, Screen_Height = root.winfo_screenwidth(), root.winfo_screenheight()
+Screen_Width, Screen_Height = 1440, 892
 # Pixel size of each tile
 Tile_Size = 32
 
