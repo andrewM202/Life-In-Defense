@@ -62,8 +62,8 @@ class World:
 
         for key in self.chunks.keys():
             player_chunk_distance_width = max([
-                abs(player_position[0] - (key[0] * Chunk_Tile_Width * Tile_Size)),
-                abs(player_position[0] - ((key[0] + 1 ) * Chunk_Tile_Width * Tile_Size))
+                abs(player_position[0] - (key[0] * Chunk_Pixel_Width)),
+                abs(player_position[0] - ((key[0] + 1 ) * Chunk_Pixel_Width))
             ])
 
             if player_chunk_distance_width > Screen_Width * 2:
@@ -73,8 +73,8 @@ class World:
                 chunks_to_delete.append(key)
 
             player_chunk_distance_height = max([
-                abs(player_position[1] - (key[1] * Chunk_Tile_Height * Tile_Size)),
-                abs(player_position[1] - ((key[1] + 1 ) * Chunk_Tile_Height * Tile_Size))
+                abs(player_position[1] - (key[1] * Chunk_Pixel_Height)),
+                abs(player_position[1] - ((key[1] + 1 ) * Chunk_Pixel_Height))
             ])
 
             if player_chunk_distance_height > Screen_Height * 2:
@@ -88,12 +88,9 @@ class World:
             del self.chunks[key]
 
         # Restore chunks that are within 2 screen widths or heights of the player
-        chunks_range_x = (player_position[0] - int(0.6 * Screen_Width), player_position[0] + int(0.6 * Screen_Width)) 
-        chunks_range_y = (player_position[1] - int(0.6 * Screen_Height), player_position[1] + int(0.6 * Screen_Height)) 
+        chunks_range_x = (player_position[0] - int(0.7 * Screen_Width), player_position[0] + int(0.7 * Screen_Width)) 
+        chunks_range_y = (player_position[1] - int(0.7 * Screen_Height), player_position[1] + int(0.7 * Screen_Height)) 
         chunks_to_load = []
-        # print(player_position[0], chunks_range_x[0])
-        # for x in range(player_position[0], chunks_range_x[0], -Chunk_Pixel_Width):
-        #     for y in range(player_position[1], chunks_range_y[0], -Chunk_Pixel_Height):
         for x in range(chunks_range_x[0], chunks_range_x[1], Chunk_Pixel_Width):
             for y in range(chunks_range_y[0], chunks_range_y[1], Chunk_Pixel_Height):
                 chunk_pos = (round(x / Chunk_Pixel_Width), round(y / Chunk_Pixel_Height))

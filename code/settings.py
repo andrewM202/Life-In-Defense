@@ -1,9 +1,13 @@
 # Settings here
 
+import tkinter
 from pygame.math import Vector2
 
+root = tkinter.Tk()
+root.withdraw()
+
 # Resolution
-Screen_Width, Screen_Height = 1360, 768
+Screen_Width, Screen_Height = root.winfo_screenwidth(), root.winfo_screenheight()#1360, 768
 # Pixel size of each tile
 Tile_Size = 32
 
