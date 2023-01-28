@@ -28,7 +28,7 @@ class Chunk():
         # Our blocks
         self.blocks = block_surfs
 
-        # The tiles in our chunk
+        # The tiles in our chunk as sprites
         self.chunk_tiles = []
 
         if not load_from_file:
