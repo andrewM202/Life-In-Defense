@@ -1,4 +1,5 @@
 import pygame
+from sys import exit
 
 class StartMenu:
     def __init__(self):
@@ -12,12 +13,13 @@ class StartMenu:
     def display(self):
 
         # Show tools
-        sky_bg_color = (92, 76, 255)
+        sky_bg_color = (172, 156, 255)
         self.display_surface.fill(sky_bg_color)
 
         # New game box
+        vertical_offset = -150
         rect_horizontal_pos = self.Screen_Width / 2 - (self.Screen_Width / 4)
-        rect_vertical_pos = self.Screen_Height / 2
+        rect_vertical_pos = self.Screen_Height / 2 + vertical_offset
         new_game_rect = pygame.Rect(rect_horizontal_pos, rect_vertical_pos ,self.Screen_Width / 2,100)
         new_game_rect_color = (0, 0, 0)
         new_game_rect_offset = new_game_rect[2] / 2
@@ -29,12 +31,12 @@ class StartMenu:
         my_font = pygame.font.SysFont('Comic Sans MS', 30)
         text_surface = my_font.render('New Game', False, (255, 255, 255))
         text_horiz_center_offset = text_surface.get_rect()[2] / 2
-        text_vert_center_offset = text_surface.get_rect()[3] / 2
+        text_vert_center_offset = text_surface.get_rect()[3] / 2  + vertical_offset
         self.display_surface.blit(text_surface, (self.Screen_Width / 2 - text_horiz_center_offset, self.Screen_Height / 2 + text_vert_center_offset))
 
         # Load world box
+        vertical_offset = 0
         rect_horizontal_pos = self.Screen_Width / 2 - (self.Screen_Width / 4)
-        vertical_offset = 150
         rect_vertical_pos = self.Screen_Height / 2 + vertical_offset
         load_world_rect = pygame.Rect(rect_horizontal_pos, rect_vertical_pos ,self.Screen_Width / 2,100)
         load_world_rect_color = (0, 0, 0)
@@ -50,6 +52,25 @@ class StartMenu:
         text_vert_center_offset = text_surface.get_rect()[3] / 2 + vertical_offset
         self.display_surface.blit(text_surface, (self.Screen_Width / 2 - text_horiz_center_offset, self.Screen_Height / 2 + text_vert_center_offset))
 
+        # Quit game box
+        vertical_offset = 150
+        rect_horizontal_pos = self.Screen_Width / 2 - (self.Screen_Width / 4)
+        rect_vertical_pos = self.Screen_Height / 2 + vertical_offset
+        quit_game_rect = pygame.Rect(rect_horizontal_pos, rect_vertical_pos ,self.Screen_Width / 2,100)
+        quit_game_rect_color = (0, 0, 0)
+        quit_game_rect_offset = new_game_rect[2] / 2
+        pygame.draw.rect(self.display_surface, quit_game_rect_color, quit_game_rect)
+
+        # Quit game box font
+        pygame.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+        my_font = pygame.font.SysFont('Comic Sans MS', 30)
+        text_surface = my_font.render('Quit', False, (255, 255, 255))
+        text_horiz_center_offset = text_surface.get_rect()[2] / 2
+        text_vert_center_offset = text_surface.get_rect()[3] / 2 + vertical_offset
+        self.display_surface.blit(text_surface, (self.Screen_Width / 2 - text_horiz_center_offset, self.Screen_Height / 2 + text_vert_center_offset))
+
+
         # Check if I click on new game
         mpos = pygame.mouse.get_pos()
         if pygame.mouse.get_pressed()[0]: # Left click
@@ -59,4 +80,7 @@ class StartMenu:
             elif load_world_rect.collidepoint(mpos): # Hovering over load game rectangle
                 print("Wow much load!")
 
+            elif quit_game_rect.collidepoint(mpos): # Hovering over load game rectangle
+                pygame.quit()
+                exit()
 
