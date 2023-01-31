@@ -12,7 +12,6 @@ class Player(pygame.sprite.Sprite):
         self.import_assets()
         self.animation_status = "ready_right" # Player's current animation state
         self.frame_index = 0 # The current frame of the current animation state
-        self.frame_direction = 1 # The direction we are moving through the frames
 
         # General setup
         self.image = self.animations[self.animation_status][self.frame_index]
@@ -47,14 +46,12 @@ class Player(pygame.sprite.Sprite):
         """ Create the player animations """
 
         # Increment our frame index by an arbitrary amount: 4
-        self.frame_index = self.frame_index + 6 * self.frame_direction * dt
+        self.frame_index = self.frame_index + 6 * dt
 
         # If wour frame goes over the amount of animation states we have, 
         # reset it to 0 so we restart the animation
         if self.frame_index >= len(self.animations[self.animation_status]):
-            self.frame_direction = -1
-        if self.frame_index == 0:
-            self.frame_direction = 1
+            self.frame_index = 0
 
         self.image = self.animations[self.animation_status][int(self.frame_index)]
 
