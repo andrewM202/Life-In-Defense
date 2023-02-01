@@ -39,6 +39,7 @@ Block_Ids = {
     "ground_center_top_right": None,
     "ground_center_bottom_left": None,
     "ground_center_bottom_right": None,
+    "ground_top_padded": None,
 }
 
 index = 0
@@ -49,4 +50,4 @@ for block_id in Block_Ids:
 New_World = True
 
 # How often caves spawn
-Block_Gen_Threshold = -0.4
+Block_Gen_Threshold = -0.5

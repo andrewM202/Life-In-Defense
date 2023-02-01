@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_strength = 15
         self.default_gravity = 0.55 # We increase self.gravity_gravity by dt every frame we jump. After the jump is done, we set self.gravity_strength back to this default
         self.gravity_strength = self.default_gravity
-        self.default_speed = 400
+        self.default_speed = 500
 
         # Collision
         self.collision_sprites = collision_sprites

@@ -70,7 +70,18 @@ class Chunk():
                     if not (self.noise[x][y-1] >= Block_Gen_Threshold and (y-1) * Tile_Size + self.chunk_offset_y >= self.ground_level):
                         try:
                             # If no block to the left
-                            if not (self.noise[x-1][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.height_map[x-1][0] * 16)):
+                            block_left = self.noise[x-1][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.height_map[x-1][0] * 16)
+                            block_right = self.noise[x+1][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.height_map[x+1][0] * 16)
+
+                            if not block_left and not block_right:
+                                self.chunk_sprites[tile_world_pos] = GroundBlock(
+                                    position = tile_world_pos, 
+                                    surface  = self.blocks[Block_Ids["ground_top_padded"]], 
+                                    groups   = [self.all_sprites, self.collision_sprites], 
+                                    block_id = Block_Ids["ground_top_padded"]
+                                )
+                                self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top_left"]
+                            elif not block_left:
                                 self.chunk_sprites[tile_world_pos] = GroundBlock(
                                     position = tile_world_pos, 
                                     surface  = self.blocks[Block_Ids["ground_top_left"]], 
@@ -79,7 +90,7 @@ class Chunk():
                                 )
                                 self.chunk_tiles[tile_world_pos] = Block_Ids["ground_top_left"]
                             # If no block to the right
-                            elif not (self.noise[x+1][y] >= Block_Gen_Threshold and y * Tile_Size + self.chunk_offset_y >= int(self.height_map[x+1][0] * 16)):
+                            elif not block_right:
                                 self.chunk_sprites[tile_world_pos] = GroundBlock(
                                     position = tile_world_pos, 
                                     surface  = self.blocks[Block_Ids["ground_top_right"]], 
