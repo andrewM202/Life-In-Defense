@@ -36,7 +36,8 @@ class Chunk():
 
         if not load_from_file:
             # Create the noies for the chunk
-            self.noise = generate_fractal_noise_2d((Screen_Tile_Width, Screen_Tile_Height), (4, 4))
+            self.noise = generate_fractal_noise_2d((Chunk_Tile_Width, Chunk_Tile_Height), (12, 12), 1)
+            # print(self.noise)
             self.height_map = generate_fractal_noise_2d((Screen_Tile_Width, 2), (2, 2))
 
             # Generate the chunk

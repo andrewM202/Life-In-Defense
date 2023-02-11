@@ -8,11 +8,14 @@ root.withdraw()
 
 # Resolution
 Screen_Width, Screen_Height = root.winfo_screenwidth(), root.winfo_screenheight()
-# Screen_Width, Screen_Height = 1440, 892
+Screen_Width, Screen_Height = 1280, 720
+# Screen_Width, Screen_Height = 1600, 900
+# resolution = Screen_Width / Screen_Height
+# Screen_Width = Screen_Height * resolution
 # Pixel size of each tile
 Tile_Size = 32
 
-# How many tiles fill up the screen
+# How many tiles fill up a chunk
 Screen_Tile_Width  = int(round(768 /2 / Tile_Size))
 Screen_Tile_Height = int(round(768 /2 / Tile_Size))
 
@@ -49,5 +52,5 @@ for block_id in Block_Ids:
 
 New_World = True
 
-# How often caves spawn
+# How often caves spawn. Lower number == less caves
 Block_Gen_Threshold = -0.5

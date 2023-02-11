@@ -194,7 +194,7 @@ class CameraGroup(pygame.sprite.Group):
                         if pygame.mouse.get_pressed()[0]: # Left click
                             pygame.sprite.Sprite.kill(sprite)
 
-                        if pygame.mouse.get_pressed()[2]: # Riight click
+                        if pygame.mouse.get_pressed()[2]: # Right click
                             # Pick a random blocks
                             id = choice([i for i in Block_Ids.values()])
                             for block in Block_Ids.items():
@@ -209,4 +209,5 @@ class CameraGroup(pygame.sprite.Group):
                             )
                             sprite.surface = self.blocks[Block_Ids[id]]
                             sprite.block_id = Block_Ids[id]
+
                             
