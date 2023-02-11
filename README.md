@@ -15,6 +15,6 @@ Current Features
 
 To Run
 1. cd into the code directory
-2. (Optional) Create an activate a virtual environment: python -m venv venv ; .\venv\Scripts\activate
+2. (Optional) Create and activate a virtual environment: python -m venv venv ; .\venv\Scripts\activate
 3. Install the dependencies: pip3 install -r requirements.txt
 4. Run the entrypoint: python .\main.py
